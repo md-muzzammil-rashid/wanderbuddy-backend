@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
-import { PostSchema } from "./post.schema.js";
+import { PostSchema } from "./post.model.js";
 
 const UserSchema = new mongoose.Schema({
     username: {
@@ -41,18 +41,7 @@ const UserSchema = new mongoose.Schema({
         bio: {
             type: String
         },
-        followers: [{
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'User'
-        }],
-        following: [{
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'User'
-        }]
     },
-    post: [{
-        type: PostSchema
-    }],
     searchHistory: [{
         type: Object
     }]

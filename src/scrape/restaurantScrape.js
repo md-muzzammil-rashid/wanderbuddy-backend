@@ -1,37 +1,48 @@
 import puppeteer from 'puppeteer'
 
 const scrapeRestaurant = async (place) => {
-    const browser = await puppeteer.launch()
+    const delay = ms => new Promise(resolve=> setTimeout(resolve, ms))
+
+    const browser = await puppeteer.launch({
+        headless: false, // Run in full browser mode
+        args: [
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--disable-blink-features=AutomationControlled',
+        ],
+})
     const page = await browser.newPage()
     // const url = `https://www.justdial.com/${place}/Restaurants/`
-    const url = "https://www.tripadvisor.in/Search?q=ranchi&geo=662320&ssrc=e&searchNearby=false&searchSessionId=0019a31d469f15b7.ssid&blockRedirect=true&offset=0"
+    const url = `https://www.tripadvisor.in/Search?q=${place}&ssrc=e`
     console.log(url);
-    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
-    await page.setExtraHTTPHeaders({
-      'Accept-Language': 'en-US,en;q=0.9',
-    });
+    // await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
+    // await page.setExtraHTTPHeaders({
+    //   'Accept-Language': 'en-US,en;q=0.9',
+    // });
     
     console.log("going to page");
-    await page.goto(url)
+    await page.goto(url, {waitUntil:'networkidle2'})
     console.log("page loaded");
-
-    const restaurantList = [];
-    const restaurantName = await page.evaluate(() => {
+    await delay(2000)
+    await page.waitForSelector(".kgrOn")
+    const restaurantList = await page.evaluate(() => {
         console.log('evaluating restaurant');
-        const restaurantElement = document.querySelectorAll('.BMQDV')
-        restaurantElement.forEach(element=>{
-            console.log("in element");
-            element.classList.forEach(l=>console.log(l))
-            // const restaurant = {
-            //     link: element.querySelectorAll('img')[0].src
-            // }
-            const restaurant = element.textContent;
-            restaurantList.push(restaurant)
+        const restaurants = []
+
+        const restaurantElementSelectors = document.querySelectorAll('.kgrOn')
+        restaurantElementSelectors.forEach(restaurantElement=>{
+            const restaurantImage = restaurantElement.querySelector("img")?.src || "";
+            
+            const restaurantName = restaurantElement.querySelectorAll("a")[2]?.innerText || "";
+            const restaurantLink = restaurantElement.querySelectorAll("a")[2]?.href || "";
+
+            restaurants.push({restaurantImage, restaurantName, restaurantLink})
         })
+        return restaurants;
     })
     
-    return restaurantList;
     await browser.close()
+    return restaurantList;
 
     // return restaurantName
 }

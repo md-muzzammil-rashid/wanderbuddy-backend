@@ -24,12 +24,18 @@ import tripRoute from './routes/trip.routes.js'
 import invitationRoute from './routes/invitation.routes.js'
 import restaurantRoute from './routes/restaurant.routes.js'
 import messageRoute from './routes/message.routes.js'
+import postRoute from './routes/post.routes.js'
+import transportationRoute from './routes/transportation.routes.js'
+import placesRoute from './routes/places.routes.js'
 
 app.use('/api/v1/users', userRoutes)
 app.use('/api/v1/trip', tripRoute)
 app.use('/api/v1/invitation', invitationRoute)
 app.use('/api/v1/restaurant', restaurantRoute)
 app.use('/api/v1/message', messageRoute)
+app.use('/api/v1/post', postRoute)
+app.use('/api/v1/transportation', transportationRoute)
+app.use('/api/v1/places', placesRoute )
 
 
 export const startServer = () => {
